@@ -1,5 +1,8 @@
 #include "Complex.h"
-//#include <string>
+#include <string>
+#include <iostream>
+
+using namespace std;
 
 Complex::Complex()
 {
@@ -34,6 +37,15 @@ double Complex::getImaginary() const
 	return imaginary_;
 }
 
+void Complex::setReal(double real)
+{
+	real_ = real;
+}
+
+void Complex::setImaginary(double imaginary)
+{
+	imaginary_ = imaginary;
+}
 
 Complex Complex::conjugate() const
 {
@@ -46,16 +58,15 @@ ostream& operator<<(ostream& lhs, const Complex& rhs)
 	return lhs << rhs.getReal() << rhs.getImaginary() << "i";
 }
 
-//ostream& operator >> (istream& lhs, const Complex& rhs)
-//{
-//	
-//	//string line;
-//	//cin.getline(cin, line);
-//	//cin.getline(cin, line);
-//	//lhs.getReal()
-//	lhs.setstate(std::ios::failbit);
-//	
-//}
+istream& operator >> (istream& lhs, Complex& rhs)
+{
+	string line;
+	getline(lhs, line);
+	string::size_type sz;
+	rhs.setReal(stod(line, &sz));
+	rhs.setImaginary(stod(line.substr(sz)));
+	return lhs;
+}
 
 Complex operator+(const Complex& lhs, const Complex& rhs)
 {
