@@ -1,10 +1,14 @@
 #pragma once
 #include "variable.h"
+
+template<class T>
 class Matrix
 {
 public:
-	Matrix(int , int, string);
+	Matrix(int , int);
+	Matrix(int);
+	Matrix();
 	~Matrix();
 private:
-	double* elements_;
+	T elements_;
 };
