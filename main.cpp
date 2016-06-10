@@ -8,22 +8,18 @@ using namespace std;
 int main()
 {
 	auto A = Matrix<int>(2, 3);
-	int zaehler = 0;
-	for (auto i = 0; i < 2; i++)
+	auto zaehler = 0;
+	for (auto i = 1; i <= 2; i++)
 	{
-		for (auto j = 0; j < 3; j++)
+		for (auto j = 1; j <= 3; j++)
 		{
 			A.setElement(i, j, zaehler++);
 		}
 	}
-	auto B = A.multiply(A, A);
-	for (auto i = 0; i < 2; i++)
-	{
-		for (auto j = 0; j < 3; j++)
-		{
-			cout << B.getElement(i, j) << endl;
-		}
-	}
+	auto B = A.getTranspose();
+	cout << A << endl;
+	cout << B << endl;
+	cout << A.getProduct(B);
 	cin.get();
 }
 
