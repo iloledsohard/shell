@@ -11,10 +11,16 @@ public:
 	~Matrix();
 	unsigned int getRowCount() const;
 	unsigned int getColumnCount() const;
+	unsigned int getElementCount() const;
 	void setElement(unsigned int, unsigned int, T);
 	T getElement(unsigned int, unsigned int) const;
+	void multiply(Matrix<T>&, const Matrix<T>&);
+	void multiply(Matrix<T>&, const T&);
 	Matrix<T> getProduct(const Matrix<T>&);
+	Matrix<T> getProduct(const T&);
+	void transpose(Matrix<T>&);
 	Matrix<T> getTranspose();
+	T& operator[](const unsigned int);
 private:
 	unsigned int rows_;
 	unsigned int columns_;
@@ -23,6 +29,8 @@ private:
 
 template <class T>
 std::ostream& operator<<(std::ostream& lhs, const Matrix<T>& rhs);
+
+
 
 
 template <class T>
@@ -74,6 +82,12 @@ unsigned Matrix<T>::getColumnCount() const
 }
 
 template <class T>
+unsigned int Matrix<T>::getElementCount() const
+{
+	return columns_*rows_;
+}
+
+template <class T>
 void Matrix<T>::setElement(unsigned int row, unsigned int column, T value)
 {
 	if (0 < row && row <= getRowCount() && 0 < column && column <= getColumnCount())
@@ -91,13 +105,18 @@ T Matrix<T>::getElement(unsigned int row, unsigned int column) const
 }
 
 template <class T>
-Matrix<T> Matrix<T>::getProduct(const Matrix<T>& faktor)
+void Matrix<T>::multiply(Matrix<T>& result, const Matrix<T>& faktor)
 {
-	if (getColumnCount()!= faktor.getRowCount())
+	if (getColumnCount() != faktor.getRowCount())
 	{
-		throw "Dimensions missmatch.";
+		throw "Inner dimensions missmatch.";
 	}
-	auto result = Matrix<T>(getRowCount(), faktor.getColumnCount());
+	auto rowsMissmatch = result.getRowCount() != getRowCount();
+	auto columnsMissmatch = result.getColumnCount() != faktor.getColumnCount();
+	if (rowsMissmatch || columnsMissmatch)
+	{
+		throw "Result dimensions missmatch.";
+	}
 	for (unsigned int i = 1; i <= getRowCount(); i++)
 	{
 		for (unsigned int j = 1; j <= faktor.getColumnCount(); j++)
@@ -110,13 +129,47 @@ Matrix<T> Matrix<T>::getProduct(const Matrix<T>& faktor)
 			result.setElement(i, j, element);
 		}
 	}
+}
+
+template <class T>
+void Matrix<T>::multiply(Matrix<T>& result, const T& faktor)
+{
+	auto rowsMissmatch = result.getRowCount() != getRowCount();
+	auto columnsMissmatch = result.getColumnCount() != getColumnCount();
+	if (rowsMissmatch || columnsMissmatch)
+		throw "Result dimensions missmatch.";
+	for (unsigned int i = 1; i <= getElementCount(); i++)
+	{
+		result[i] = this[i] * faktor;
+	}
+}
+
+template <class T>
+Matrix<T> Matrix<T>::getProduct(const Matrix<T>& faktor)
+{
+	auto result = Matrix<T>(getRowCount(), faktor.getColumnCount());
+	multiply(result, faktor);
 	return result;
 }
 
 template <class T>
-Matrix<T> Matrix<T>::getTranspose()
+Matrix<T> Matrix<T>::getProduct(const T&faktor)
 {
-	auto result = Matrix(getColumnCount(), getRowCount());
+	auto result = Matrix<T>(getRowCount, getColumnCount);
+	for (unsigned int i = 1; i <= getElementCount(); i++)
+	{
+		result[i] = this[i];
+	}
+	return result;
+}
+
+template <class T>
+void Matrix<T>::transpose(Matrix<T>& result)
+{
+	auto resultRowMissmatch = result.getRowCount() != getColumnCount(); 
+	auto resultColumnMissmatch = result.getColumnCount() != getRowCount();
+	if (resultColumnMissmatch || resultRowMissmatch)
+		throw "Result dimensions missmatch.";
 	for (unsigned int i = 1; i <= result.getRowCount(); i++)
 	{
 		for (unsigned int j = 1; j <= result.getColumnCount(); j++)
@@ -124,7 +177,22 @@ Matrix<T> Matrix<T>::getTranspose()
 			result.setElement(i, j, getElement(j, i));
 		}
 	}
+}
+
+template <class T>
+Matrix<T> Matrix<T>::getTranspose()
+{
+	auto result = Matrix(getColumnCount(), getRowCount());
+	transpose(result);
 	return result;
+}
+
+template <class T>
+T& Matrix<T>::operator[](const unsigned int index)
+{
+	if (index <= getElementCount())
+		return elements_[index - 1];
+	throw "Index out of bounds.";
 }
 
 template <class T>
